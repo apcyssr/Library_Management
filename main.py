@@ -28,3 +28,18 @@ class BookResponse(BookBase):
     id: int
     class Config:
         from_attributes = True
+
+
+# --- API ROUTES (FastAPI) ---
+
+@app.get("/")
+def root():
+    return RedirectResponse(url="/ui")
+
+@app.post("/books", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
+def add_new_book(book: BookCreate, db: Session = Depends(get_db)):
+    return crud.create_book(db=db, book_data=book.model_dump())
+
+@app.get("/books", response_model=List[BookResponse])
+def view_all_books(db: Session = Depends(get_db)):
+    return crud.get_all_books(db=db)
